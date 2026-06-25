@@ -149,14 +149,7 @@ flask run
 
 ### Deployed version usage
 
-1. Set `DB_URL` and `SECRET_KEY` as environment variables in your platform's dashboard — do **not** commit `.env`.
-2. Use a production WSGI server instead of the Flask dev server:
-   ```bash
-   pip install gunicorn
-   gunicorn app:app
-   ```
-3. Ensure your PostgreSQL provider allows external connections and that `sslmode=require` is supported (it is enabled by default in `app.py`).
-4. Set `SESSION_TYPE = "filesystem"` or switch to a database-backed session store for multi-worker deployments.
+The project is fully available at: https://rune20.onrender.com
 
 ---
 
