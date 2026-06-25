@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Register
+{% endblock %}
+
+{% block main %}
+<form action="{{ url_for('register') }}" method="post" class="auth-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <h2 class="auth-title">Create Your Account</h2>
+    <p class="auth-subtitle">Set up your profile to start building parties and campaigns.</p>
+
+    <div class="mb-3">
+        <input autocomplete="username" autofocus class="form-control" name="username" placeholder="Username" type="text"
+            required aria-label="Username" pattern="^(?=.{3,20}$)[a-zA-Z](?!.*[._]{2})[a-zA-Z0-9._]*[a-zA-Z0-9]$" title="Username must be 3-20 characters, start with a letter, contain only letters, numbers, dots or underscores, and cannot have
+             consecutive special characters or end with one.">
+    </div>
+    <div class="mb-3">
+        <input autocomplete="off" class="form-control" name="email" placeholder="Email" type="email" required
+            aria-label="Email" title="Enter a valid email address. Example: user@example.com.">
+    </div>
+    <div class="mb-3">
+        <div class="password-field">
+            <input autocomplete="current-password" id="password" class="form-control" name="password" placeholder="Password"
+                type="password" required aria-label="Password"
+                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,20}$"
+                title="Password must be 8-20 characters, contain at least one lowercase, one uppercase, one number and one special character.">
+            <button type="button" class="password-toggle" data-toggle-password="password,confirmation" data-show-text="Show" data-hide-text="Hide"
+                aria-label="Toggle password visibility" aria-pressed="false">Show</button>
+        </div>
+        <input autocomplete="current-password" id="confirmation" class="form-control mt-2" name="confirmation"
+            placeholder="Confirm Password" type="password" required aria-label="Password confirmation"
+            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,20}$"
+            title="Password must be 8-20 characters, contain at least one lowercase, one uppercase, one number and one special character.">
+        <small class="auth-hint">Tip: keep both password fields matching before submitting.</small>
+    </div>
+    <button class="btn btn-dark" type="submit" aria-label="Create account button">Create account</button>
+    <p aria-label="Already have an account?">Already have an account? <a href="{{ url_for('login') }}"
+            aria-label="Log into an account link">Log In</a></p>
+</form>
+{% endblock %}

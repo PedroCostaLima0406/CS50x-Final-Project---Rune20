@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Log In
+{% endblock %}
+
+{% block main %}
+<form action="{{ url_for('login') }}" method="post" class="auth-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <h2 class="auth-title">Welcome Back</h2>
+    <p class="auth-subtitle">Log in to manage your campaigns and character sheets.</p>
+
+    <div class="mb-3">
+        <input autocomplete="username" autofocus class="form-control" name="username" placeholder="Username" type="text"
+            required aria-label="Username" pattern="^(?=.{3,20}$)[a-zA-Z](?!.*[._]{2})[a-zA-Z0-9._]*[a-zA-Z0-9]$" title="Username must be 3-20 characters, start with a letter, contain only letters, numbers, dots or underscores, and cannot have
+             consecutive special characters or end with one.">
+    </div>
+    <div class="mb-3">
+        <input autocomplete="off" class="form-control" name="email" placeholder="Email" type="email" required
+            aria-label="Email" title="Enter a valid email address. Example: user@example.com.">
+    </div>
+    <div class="mb-3">
+        <div class="password-field">
+            <input autocomplete="current-password" id="password" class="form-control" name="password" placeholder="Password"
+                type="password" required aria-label="Password"
+                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,20}$"
+                title="Password must be 8-20 characters, contain at least one lowercase, one uppercase, one number and one special character.">
+            <button type="button" class="password-toggle" data-toggle-password="password" data-show-text="Show" data-hide-text="Hide"
+                aria-label="Toggle password visibility" aria-pressed="false">Show</button>
+        </div>
+        <small class="auth-hint">Use at least 8 characters with uppercase, lowercase, number and symbol.</small>
+    </div>
+    <button class="btn btn-dark" type="submit" aria-label="Log in button">Log In</button>
+    <p aria-label="Don't have an account?">Don't have an account? <a href="{{ url_for('register') }}"
+            aria-label="Register account link">Register</a></p>
+</form>
+{% endblock %}

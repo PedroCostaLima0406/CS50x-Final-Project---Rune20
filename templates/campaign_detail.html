@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Campaign detail
+{% endblock %}
+
+{% block main %}
+    <div class="campaign-detail-shell">
+        <div class="campaign-hero card">
+            <div>
+                <h2 aria-label="Campaign name {{ campaign['name'] }}">{{ campaign['name'] }}</h2>
+                <small aria-label="Created at: {{ campaign['created_at'] | format_datetime }}">Created at: {{ campaign['created_at'] | format_datetime }}</small>
+                <br>
+                <small aria-label="Join code: {{ campaign['join_code'] }}">Join code: {{ campaign['join_code'] }}</small>
+            </div>
+            <div id="campaign-data"
+                data-campaign-id="{{ campaign['id'] }}"
+                data-default-character-id="{{ campaign_characters[0]['id'] if campaign_characters else '' }}">
+            </div>
+        </div>
+
+        <div class="campaign campaign-summary card">
+            <h4 aria-label="Campaign description: {{ campaign['description'] }}">Description</h4>
+            <p>{{ campaign['description'] }}</p>
+        </div>
+
+        {% if campaign_characters %}
+            <div class="card-grid campaign-character-grid">
+                {% for campaign_character in campaign_characters %}
+                    <div class="card campaign-character-card">
+                        <p aria-label="campaign character name {{ campaign_character['name'] }}">Name: {{ campaign_character['name'] }}</p>
+                        <small aria-label="player {{ campaign_character['name'] }}">player: {{ campaign_character['username'] }}</small>
+
+                        <div class="card-actions">
+                            <form action="{{ url_for('remove_character') }}" method="post" class="inline-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="character_id" value="{{ campaign_character['id'] }}">
+                                <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure? You remove this character from the campaign.');"
+                                aria-label="remove character button">
+                                    Remove Character
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if dice_log %}
+            <div class="dice_log card dice-log-panel" id="dice-log-container">
+                <h3 aria-label="Campaign's dice roll log">Campaign's dice roll log</h3>
+                {% for roll in dice_log %}
+                    <div class="card dice-log-entry">
+                        <p>{{ roll['name'] }}</p>
+                        <p>{{ roll['roll_result'] }}</p>
+                        <small>Created at: {{ roll['created_at'] | format_datetime }}</small>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="dice_log card dice-log-panel">
+                <h3 aria-label="Campaign's dice roll log">Campaign's dice roll log</h3>
+                <p>No dice rolls yet. Let the chaos begin!</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

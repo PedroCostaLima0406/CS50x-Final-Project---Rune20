@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Character creation
+{% endblock %}
+
+{% block main %}
+    <form action="{{ url_for('character_creation') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control" name="name" placeholder="Character name" type="text"
+             required aria-label="Character name"
+
+             pattern="^[A-Za-z -']{2,30}$"
+             title="Character name must be 2-20 characters and contain only letters, numbers, apostrophes, spaces and hyphens. No repeated special characters"
+             >
+        </div>
+        <div class="mb-3">
+            <input autocomplete="off" class="form-control" name="race" placeholder="Character race" type="text"
+             required aria-label="Race">
+        </div>
+        <div class="mb-3">
+            <input autocomplete="off" class="form-control" name="class" placeholder="Character class" type="text"
+             required aria-label="Class">
+        </div>
+        <div class="mb-3">
+            <textarea autocomplete="off" class="form-control" name="skills" placeholder="Character skills"
+            rows="5" cols="30" required aria-label="Skills"
+            ></textarea>
+        </div>
+        <div class="mb-3">
+            <textarea autocomplete="off" class="form-control" name="background" placeholder="Character background"
+            rows="4" cols="40" required aria-label="Background"
+            ></textarea>
+        </div>
+        <div class="mb-3">
+            <textarea autocomplete="off" class="form-control" name="notes" placeholder="Character notes"
+            rows="4" cols="40" required aria-label="Notes"
+            ></textarea>
+        </div>
+        <button class="btn btn-dark" type="submit" aria-label="Create character button">Create character</button>
+    </form>
+{% endblock %}

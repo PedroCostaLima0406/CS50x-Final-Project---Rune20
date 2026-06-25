@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Account
+{% endblock %}
+
+{% block main %}
+    <section class="account-shell" aria-label="Account details section">
+        <div class="account-card">
+            <div class="account-hero">
+                <div class="account-avatar" aria-hidden="true">{{ username[0] | upper if username else 'U' }}</div>
+                <div>
+                    <h2 class="account-title">{{ username }}</h2>
+                    <p class="account-subtitle">Manage your profile and session settings.</p>
+                </div>
+            </div>
+
+            <div class="account-grid">
+                <article class="account-item">
+                    <span class="account-label">Username</span>
+                    <p id="username" class="account-value" aria-label="Username {{ username }}">{{ username }}</p>
+                </article>
+
+                <article class="account-item">
+                    <span class="account-label">Email</span>
+                    <p id="email" class="account-value" aria-label="Email {{ email }}">{{ email }}</p>
+                </article>
+            </div>
+
+            <div class="account-actions">
+                <form action="{{ url_for('logout') }}" method="post" class="inline-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-danger" type="submit" onclick="return confirm('Are you sure? You will log out of your account.');"
+                    aria-label="Log out button">Log Out</button>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}

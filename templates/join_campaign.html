@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Join a Campaign
+{% endblock %}
+
+{% block main %}
+    <form action="{{ url_for('join_campaign') }}" method="post" class="join-campaign-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+            <label for="character" aria-label="Character select menu">Select a character</label>
+            <select class="form-control character-select" name="character_id" id="character" required>
+                <option value="" selected disabled>Choose your adventurer</option>
+
+                {% for character in characters %}
+                    <option value="{{ character['id'] }}" aria-label="Name {{ character['name'] }}">{{ character['name'] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <input autocomplete="off" class="form-control" name="code" placeholder="Campaign join code" type="text" required
+            aria-label="Campaign join code">
+        </div>
+        <button class="btn btn-dark" type="submit" aria-label="Join campaign button">Join campaign</button>
+    </form>
+{% endblock %}

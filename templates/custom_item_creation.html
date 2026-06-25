@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Create Item
+{% endblock %}
+
+{% block main %}
+    <form action="{{ url_for('custom_item_creation') }}" method="post">
+        <div class="mb-3">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input autocomplete="off" autofocus class="form-control" name="name" placeholder="Item name" type="text"
+             required aria-label="item name"
+
+             pattern="^[A-Za-z0-9()' -]{2,50}$"
+             title="Item name must be 2-50 characters and may contain special characters, but not in leading, trailing or repeated positions"
+             >
+        </div>
+        <div class="mb-3">
+            <textarea autocomplete="off" class="form-control" name="description" placeholder="Item description"
+            rows="4" cols="40" aria-label="item description"
+            ></textarea>
+        </div>
+        <button class="btn btn-dark" type="submit" aria-label="Create item button">Create custom item</button>
+    </form>
+{% endblock %}

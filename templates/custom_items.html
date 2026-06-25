@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Custom items
+{% endblock %}
+
+{% block main %}
+    <h2>Inventory</h2>
+    {% if custom_items %}
+        <div class="card-grid">
+            {% for item in custom_items %}
+                <div class="custom-item card">
+                    <p aria-label="Item {{ item['name'] }}">Item: {{ item['name'] }}</p>
+                    <br>
+                    <p aria-label="Description {{ item['description'] }}">Item description: {{ item['description'] }}</p>
+
+                    <div class="card-actions">
+                        <form action="{{ url_for('custom_item_edit') }}" method="get" class="inline-form">
+                            <input type="hidden" name="custom_item_id" value="{{ item['id'] }}">
+                            <button type="submit" class="btn btn-outline-warning" aria-label="Edit item button">Edit Custom Item</button>
+                        </form>
+                        <form action="{{ url_for('delete_custom_item') }}" method="post" class="inline-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="custom_item_id" value="{{ item['id'] }}">
+                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure? You will delete your custom item permanently.');"
+                            aria-label="Delete item button">Delete Custom Item</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <div class="empty-state card">
+            <p>You haven't created any custom items yet.</p>
+            <div class="empty-state-actions">
+                <a href="{{ url_for('custom_item_creation') }}" class="btn btn-primary">Create Custom Item</a>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

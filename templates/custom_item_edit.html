@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Custom item edit
+{% endblock %}
+
+{% block main %}
+    <h2>{{ custom_item['name'] }}</h2>
+
+    <form action="{{ url_for('custom_item_edit') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="custom_item_id" value="{{ custom_item['id'] }}">
+        <div class="mb-3">
+            <label for="name" class="form-label">Name:</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ custom_item['name'] | trim }}"
+            required aria-label="Item name"
+
+            pattern="^[A-Za-z0-9()' -]{2,50}$"
+            title="Item name must be 2-50 characters and may contain special characters, but not in leading, trailing or repeated positions">
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description:</label>
+            <textarea autocomplete="off" class="form-control" name="description" id="description"
+            rows="4" cols="40" aria-label="Item description"
+            >{{ custom_item['description'] | trim }}</textarea>
+        </div>
+        <button class="btn btn-outline-warning" type="submit" aria-label="Save changes button">Save changes</button>
+    </form>
+{% endblock %}

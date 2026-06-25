@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1, width=device-width">
+
+        <!-- http://getbootstrap.com/docs/5.3/ -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon.d20.png', v='1') }}">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.d20.png', v='1') }}">
+        <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/favicon.d20.png', v='1') }}">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel&family=Cinzel+Decorative&family=EB+Garamond&family=Roboto&display=swap">
+        <link rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}">
+        <script src="{{ url_for('static', filename='scripts.js') }}"></script>
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
+        <title>Rune20 - {% block title %}D&D5e{% endblock %}</title>
+    </head>
+
+    <body>
+
+        <header>
+            <h1 class="header-title {% if header_img %}{{ header_img }}{% endif %}">{% block header_title %}{{ self.title() }}{% endblock %}</h1>
+
+            <nav aria-label="Main navigation">
+                <ul>
+                    <li><a href="{{ url_for('index') }}" aria-label="Characters">Characters</a></li>
+                    <li><a href="{{ url_for('character_creation') }}" aria-label="Create character">Create Character</a></li>
+                    <li><a href="{{ url_for('custom_item_creation') }}" aria-label="Custom item creation">Create Custom Item</a></li>
+                    <li><a href="{{ url_for('custom_items') }}" aria-label="Custom items inventory">Custom Items</a></li>
+                    <li><a href="{{ url_for('campaigns') }}" aria-label="Campaigns">Campaigns</a></li>
+                    <li><a href="{{ url_for('campaign_creation') }}" aria-label="Campaign creation">Create Campaign</a></li>
+                    <li><a href="{{ url_for('join_campaign') }}" aria-label="Join campaign">Join Campaign</a></li>
+                    <li><a href="{{ url_for('account') }}" aria-label="Account information">Account</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flashed-messages">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category if category != 'message' else 'info' }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block main %}{% endblock %}
+        </main>
+
+        <footer>
+            <p aria-label="A final project for Cs50x, 2025">Final Project - Cs50x 2025</p>
+            <p aria-label="Non-official, fan-made for D&D5e usage">Non-official, fan-made for D&D5e usage</p>
+        </footer>
+    </body>
+
+</html>

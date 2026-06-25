@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Campaign creation
+{% endblock %}
+
+{% block main %}
+    <form action="{{ url_for('campaign_creation') }}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control" name="name" placeholder="Campaign name" type="text"
+             required aria-label="Campaign name"
+             >
+        </div>
+        <div class="mb-3">
+            <textarea autocomplete="off" class="form-control" name="description" placeholder="Campaign description"
+            rows="4" cols="40" aria-label="Campaign description"
+            ></textarea>
+        </div>
+        <button class="btn btn-dark" type="submit" aria-label="Create campaign button">Create campaign</button>
+    </form>
+{% endblock %}

@@ -1,0 +1,308 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Character Sheet
+{% endblock %}
+
+{% block main %}
+    <div class="sheet-grid">
+        <div class="sheet-left">
+            <div class="sheet-identity card">
+                <h2 aria-label="Character name {{ character['name'] }}">{{ character['name'] }}</h2>
+            </div>
+
+            <div class="hp">
+                <div class="health-controls">
+                    <button class="adjust-btn" data-change="-5" aria-label="Decrease hit points by 5">&laquo;</button>
+                    <button class="adjust-btn" data-change="-1" aria-label="Decrease hit points by 1">&lsaquo;</button>
+
+                    <div class="health-bar-container" aria-label="Hit points bar">
+                        <div class="health-bar-fill"></div>
+                        <div class="health-bar-text" role="textbox" aria-label="Current and Maximum Hit Points">
+                            <span class="current_hp"
+                                contenteditable="true"
+                                data-field="hit_points"
+                                data-id="{{ character['id'] }}"
+                                aria-label="Current Hit Points"
+                                role="textbox"
+                                spellcheck="false">{{ character['hit_points'] }}</span>
+                            <span>/</span>
+                            <span class="max_hp"
+                                contenteditable="true"
+                                data-field="max_hit_points"
+                                data-id="{{ character['id'] }}"
+                                aria-label="Maximum Hit Points"
+                                role="textbox"
+                                spellcheck="false">{{ character['max_hit_points'] }}</span>
+                        </div>
+                    </div>
+
+                    <button class="adjust-btn" data-change="1" aria-label="Increase hit points by 1">&rsaquo;</button>
+                    <button class="adjust-btn" data-change="5" aria-label="Increase hit points by 5">&raquo;</button>
+
+                    <div class="temp-hp-display" aria-label="Temporary Hit Points">
+                        Temp Hp:
+                        <span contenteditable="true"
+                            data-field="temp_hp"
+                            data-id="{{ character['id'] }}"
+                            aria-label="Temporary Hit Points"
+                            role="textbox"
+                            spellcheck="false">{{ character['temp_hp'] }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-d20">
+                <div class="stats-d20-center"></div>
+
+                <svg class="stats-d20-svg" viewBox="0 0 350 350" aria-hidden="true">
+                    <!-- Hexagon -->
+                    <polygon class="sigil-secondary" points="175,95 244.28,135 244.28,215 175,255 105.72,215 105.72,135" />
+                    
+                    <!-- Outer upward triangle -->
+                    <polygon class="sigil-primary" points="175,95 105.72,215 244.28,215" />
+                    
+                    <!-- Inverted inner triangle -->
+                    <polygon class="sigil-primary" points="140.36,155 175,215 209.64,155" />
+                    
+                    <!-- Lines from inverted triangle vertices to hexagon vertices -->
+                    <line class="sigil-secondary" x1="140.36" y1="155" x2="105.72" y2="135" />
+                    <line class="sigil-secondary" x1="209.64" y1="155" x2="244.28" y2="135" />
+                    <line class="sigil-secondary" x1="175" y1="215" x2="175" y2="255" />
+                </svg>
+
+                {% set stat_abbr = {
+                    "strength": "STR",
+                    "dexterity": "DEX",
+                    "constitution": "CON",
+                    "intelligence": "INT",
+                    "wisdom": "WIS",
+                    "charisma": "CHA"
+                } %}
+
+                {% for stat, value in character['stats'].items() %}
+                    <div class="stats-node pos-{{ loop.index0 | stat_position_class }}">
+                        <div class="stats-node-name" aria-label="{{ stat }} stat">{{ stat_abbr[stat] | default(stat[:3].upper()) }}</div>
+                        <div class="stats-node-value">
+                            <span contenteditable="true" data-field="{{ stat }}" data-id="{{ character['id'] }}" role="textbox" aria-label="{{ stat }} value" spellcheck="false">{{ value }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="identity-card card">
+                <div class="identity-grid">
+                    <div class="identity-field">
+                        <span class="identity-label">Race</span>
+                        <span contenteditable="true" data-field="race" data-id="{{ character['id'] }}" role="textbox" aria-label="Character's race" spellcheck="false">{{ character['race'] }}</span>
+                    </div>
+
+                    <div class="identity-field">
+                        <span class="identity-label">Class</span>
+                        <span contenteditable="true" data-field="class" data-id="{{ character['id'] }}" role="textbox" aria-label="Character's class" spellcheck="false">{{ character['class'] }}</span>
+                    </div>
+
+                    <div class="identity-field identity-field-wide">
+                        <span class="identity-label">Level</span>
+                        <div class="identity-inline">
+                            <span contenteditable="true" data-field="level" data-id="{{ character['id'] }}" role="textbox" aria-label="Character's level" spellcheck="false">{{ character['level'] }}</span>
+                            <span class="identity-divider">/</span>
+                            <span class="identity-label">XP</span>
+                            <span contenteditable="true" data-field="xp" data-id="{{ character['id'] }}" role="textbox" aria-label="Experience points" spellcheck="false">{{ character['xp'] }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sheet-right">
+            {% if character['campaign'] %}
+                <div class="campaign card">
+                    <p aria-label="Campaign {{ character['campaign']['name'] }}">Campaign: {{ character['campaign']['name'] }}</p>
+                    <small aria-label="Created by {{ character['campaign']['creator'] }}">Created by: {{ character['campaign']['creator'] }}</small>
+                    <small aria-label="Created at {{ character['campaign']['created_at'] | format_datetime }}">Created at: {{ character['campaign']['created_at'] | format_datetime }}</small>
+
+                    <div class="card-actions">
+                        <form action="{{ url_for('exit_campaign') }}" method="post" class="inline-form" style="display:inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="character_id" value="{{ character['id'] }}">
+                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure? You will exit the campaign.');" aria-label="Exit campaign button">Exit Campaign</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="dice_roll card">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="input-group-row">
+                        <input type="text" id="character-dice-formula" placeholder="e.g. 1d6+3">
+                        <button type="button" onclick="rollDice({ campaignId: {{ character['campaign']['id'] }}, characterId: {{ character['id'] }}, formula: document.getElementById('character-dice-formula').value })" aria-label="Dice roll button">Roll Dice</button>
+                    </div>
+                    <div id="dice-result" aria-label="Roll result"></div>
+                </div>
+            {% endif %}
+
+            <div class="catalog-control card">
+                <h3 aria-label="Learn spells">Learn Spells</h3>
+                <div class="input-group-row">
+                    <select id="spell_select">
+                        {% for spell in spell_catalog %}
+                            <option value="{{ spell['id'] }}" aria-label="Spell name {{ spell['name'] }}">{{ spell['name'] }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="btn btn-primary" onclick="add_entity({{ character['id'] }}, 'spell_select', 'spell')" aria-label="Learn spell button">Learn</button>
+                </div>
+            </div>
+
+            {% if spells %}
+                <div class="spells">
+                    <h3 aria-label="Known spells">Known Spells</h3>
+                    <div class="card-grid">
+                        {% for spell in spells %}
+                            <div id="spell-{{ spell['id'] }}" class="card">
+                                <h4 aria-label="Spell name {{ spell['name'] }}">{{ spell['name'] }}</h4>
+                                {% for key, value in spell.items() %}
+                                    {% if key != 'id' and key != 'name' %}
+                                        {% if key == 'description' %}
+                                            <details class="collapsible-meta" aria-label="Spell description">
+                                                <summary><strong class="label-key">Description</strong></summary>
+                                                <p>{{ value }}</p>
+                                            </details>
+                                        {% else %}
+                                            <p aria-label="Spell {{ key }}"><strong class="label-key">{{ key | field_label }}:</strong>
+                                                {% if key.endswith('_at') %}
+                                                    {{ value | format_datetime }}
+                                                {% else %}
+                                                    {{ value }}
+                                                {% endif %}
+                                            </p>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                                <div class="card-actions">
+                                    <button class="btn btn-outline-danger" onclick="remove_entity({{ character['id'] }}, null, null, {{ spell['id'] }})" aria-label="Delete spell button">Forget Spell</button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="catalog-control card">
+                <h3 aria-label="Item catalog">Add Items</h3>
+                <div class="input-group-row">
+                    <select id="item_select">
+                        {% for item in item_catalog %}
+                            <option value="{{ item['id'] }}" aria-label="Item name {{ item['name'] }}">{{ item['name'] }}{% if item['value'] != Null %}, value: {{ item['value'] }}{% endif %}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="btn btn-primary" onclick="add_entity({{ character['id'] }}, 'item_select', 'item')" aria-label="Add item button">Add</button>
+                </div>
+            </div>
+
+            {% if items or character['gold'] %}
+                <div class="inventory">
+                    <h3 aria-label="Item inventory">Inventory</h3>
+                    <div class="gold-display card-sub mb-3">
+                        <label>Gold Amount:</label>
+                        <span contenteditable="true" data-field="gold" data-id="{{ character['id'] }}" role="textbox" aria-label="Gold amount {{ character['gold'] }}" spellcheck="false">{{ character['gold'] }}</span>
+                    </div>
+
+                    {% if items %}
+                        <div class="card-grid">
+                            {% for item in items %}
+                                <div id="item-{{ item['id'] }}" class="card">
+                                    <h4 aria-label="Item {{ item['name'] }} times {{ item['quantity'] }}">{{ item['name'] }} x{{ item['quantity'] }}</h4>
+                                    {% for key, value in item.items() %}
+                                        {% if key != 'id' and key != 'name' and key != 'quantity' %}
+                                            {% if key == 'description' %}
+                                                <details class="collapsible-meta" aria-label="Item description">
+                                                    <summary><strong class="label-key">Description</strong></summary>
+                                                    <p>{{ value }}</p>
+                                                </details>
+                                            {% else %}
+                                                <p aria-label="Item {{ key }}"><strong class="label-key">{{ key | field_label }}:</strong>
+                                                    {% if key.endswith('_at') %}
+                                                        {{ value | format_datetime }}
+                                                    {% else %}
+                                                        {{ value }}
+                                                    {% endif %}
+                                                </p>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    <div class="card-actions">
+                                        <button class="btn btn-outline-danger" onclick="remove_entity({{ character['id'] }}, {{ item['id'] }}, null, null)" aria-label="Remove item button">Remove</button>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {% if custom_item_catalog %}
+                <div class="catalog-control card">
+                    <h3 aria-label="Custom item catalog">Add Custom Items</h3>
+                    <div class="input-group-row">
+                        <select id="custom_item_select">
+                            {% for custom_item in custom_item_catalog %}
+                                <option value="{{ custom_item['id'] }}" aria-label="Custom item name {{ custom_item['name'] }}">{{ custom_item['name'] }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="button" class="btn btn-primary" onclick="add_entity({{ character['id'] }}, 'custom_item_select', 'custom_item')" aria-label="Add custom item button">Add</button>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if custom_items %}
+                <div class="inventory">
+                    <h3 aria-label="Custom item inventory">Custom Items</h3>
+                    <div class="card-grid">
+                        {% for custom_item in custom_items %}
+                            <div id="custom_item-{{ custom_item['id'] }}" class="card">
+                                <h4 aria-label="Custom item {{ custom_item['name'] }} times {{ custom_item['quantity'] }}">{{ custom_item['name'] }} x{{ custom_item['quantity'] }}</h4>
+                                {% for key, value in custom_item.items() %}
+                                    {% if key != 'id' and key != 'name' and key != 'quantity' %}
+                                        {% if key == 'description' %}
+                                            <details class="collapsible-meta" aria-label="Custom item description">
+                                                <summary><strong class="label-key">Description</strong></summary>
+                                                <p>{{ value }}</p>
+                                            </details>
+                                        {% else %}
+                                            <p aria-label="Custom item {{ key }}"><strong class="label-key">{{ key | field_label }}:</strong> {{ value }}</p>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                                <div class="card-actions">
+                                    <button class="btn btn-outline-danger" onclick="remove_entity({{ character['id'] }}, null, {{ custom_item['id'] }}, null)" aria-label="Remove custom item button">Remove</button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="skills">
+                <h3>Character Skills</h3>
+                <span contenteditable="true" data-field="skills_notes" data-id="{{ character['id'] }}" role="textbox" aria-label="Skills" spellcheck="false">{{ character['skills_notes'] }}</span>
+            </div>
+
+            <div class="notes">
+                <h3>Character Notes</h3>
+                <span contenteditable="true" data-field="notes" data-id="{{ character['id'] }}" role="textbox" aria-label="Notes" spellcheck="false">{{ character['notes'] }}</span>
+            </div>
+
+            <div class="notes">
+                <h3>Character Background</h3>
+                <span contenteditable="true" data-field="background" data-id="{{ character['id'] }}" role="textbox" aria-label="Character's background" spellcheck="false">{{ character['background'] }}</span>
+            </div>
+
+            {% if character['campaign'] %}
+                <div class="notes">
+                    <h3 aria-label="Campaign description">Campaign Description</h3>
+                    <p aria-label="{{ character['campaign']['description'] }}">{{ character['campaign']['description'] }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

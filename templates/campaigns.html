@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Campaigns
+{% endblock %}
+
+{% block main %}
+    <h2 aria-label="Owned campaigns">Owned Campaigns</h2>
+    {% if owned_campaigns %}
+        <div class="card-grid">
+            {% for campaign in owned_campaigns %}
+                <div class="owned-campaign card">
+                    <a href="{{ url_for('campaign_detail', campaign_id=campaign['id']) }}" class="campaign-name" aria-label="Campaign name {{ campaign['name'] }}">{{ campaign['name'] }}</a>
+                    <br>
+                    <small aria-label="Created at: {{ campaign['created_at'] | format_datetime }}">Created at: {{ campaign['created_at'] | format_datetime }}</small>
+
+                    <div class="card-actions">
+                        <a href="{{ url_for('campaign_detail', campaign_id=campaign['id']) }}" class="btn btn-outline-secondary"
+                        aria-label="View campaign button">View Campaign</a>
+                        <form action="{{ url_for('delete_campaign') }}" method="post" class="inline-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="campaign_id" value="{{ campaign['id'] }}">
+                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure? You will delete your campaign permanently.');"
+                            aria-label="Delete campaign button">Delete Campaign</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <div class="empty-state card">
+            <p>You don't own any campaigns yet.</p>
+            <div class="empty-state-actions">
+                <a href="{{ url_for('campaign_creation') }}" class="btn btn-primary">Create Campaign</a>
+            </div>
+        </div>
+    {% endif %}
+
+    <h2>Joined Campaigns</h2>
+    {% if joined_campaigns %}
+        <div class="card-grid">
+            {% for campaign in joined_campaigns %}
+                <div class="joined-campaign card">
+                    <strong class="campaign-name" aria-label="Campaign name {{ campaign['name'] }}">{{ campaign['name'] }}</strong>
+                    <br>
+                    <small aria-label="Character used {{ campaign['cha_name'] }}">Character used: {{ campaign['cha_name'] }}</small>
+                    <small aria-label="Created by {{ campaign['username'] }}">Created by: {{ campaign['username'] }}</small>
+                    <small aria-label="Created at {{ campaign['created_at'] }}">Created at: {{ campaign['created_at'] | format_datetime }}</small>
+
+                    <div class="card-actions">
+                        <form action="{{ url_for('exit_campaign') }}" method="post" class="inline-form">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="character_id" value="{{ campaign['id'] }}">
+                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure? You will exit the campaign.');"
+                            aria-label="Exit campaign button">Exit Campaign</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <div class="empty-state card">
+            <p>You haven't joined any campaigns yet.</p>
+            <div class="empty-state-actions">
+                <a href="{{ url_for('join_campaign') }}" class="btn btn-primary">Join Campaign</a>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
