@@ -378,7 +378,7 @@ ul {
     animation: pulse 1s infinite;
 }
 
-/* common elements & layout polish */
+/* common elements and layout polish */
 main h2,
 main h3,
 main h4 {
@@ -1492,24 +1492,47 @@ button:hover,
         gap: 8px;
     }
     nav {
+        position: relative;
         width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
-        padding: 5px 0;
-        scrollbar-width: none; /* Hide Firefox scrollbar */
+        scroll-snap-type: x proximity;
+        padding: 5px 0 7px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 0, 60, 0.35) transparent;
+    }
+    nav::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 26px;
+        height: 100%;
+        background: linear-gradient(to right, rgba(16, 17, 17, 0), rgba(16, 17, 17, 0.96));
+        pointer-events: none;
+        z-index: 1;
     }
     nav::-webkit-scrollbar {
-        display: none; /* Hide Chrome/Safari scrollbar */
+        height: 4px;
+    }
+    nav::-webkit-scrollbar-thumb {
+        background: rgba(255, 0, 60, 0.35);
+        border-radius: 99px;
     }
     nav ul {
         flex-wrap: nowrap;
         justify-content: flex-start;
         gap: 0.4rem;
+        width: max-content;
+        min-width: 100%;
+        padding: 0 10px 0 2px;
     }
     nav li {
         flex-shrink: 0;
+        scroll-snap-align: start;
     }
     nav a {
+        display: block;
         font-size: 0.84rem;
         padding: 0.45rem 0.72rem;
         border-radius: 14px;
