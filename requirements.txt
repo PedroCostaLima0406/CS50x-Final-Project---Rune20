@@ -1,0 +1,7 @@
+Flask
+Flask-WTF
+psycopg2-binary
+python-dotenv
+Werkzeug
+Flask-Session
+requests
