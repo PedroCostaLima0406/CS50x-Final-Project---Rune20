@@ -233,10 +233,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 data.forEach(roll => {
                     const card = document.createElement("div");
                     card.classList.add("card");
+                    const rollLabel = roll.formula ? `${roll.formula} = ${roll.roll_result}` : `${roll.roll_result}`;
 
                     card.innerHTML = `
                         <p>${roll.name}</p>
-                        <p>${roll.roll_result}</p>
+                        <p>${rollLabel}</p>
                         <small>Created at: ${formatDateTime(roll.created_at)}</small>
                     `;
 

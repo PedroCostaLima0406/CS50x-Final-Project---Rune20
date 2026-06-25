@@ -52,7 +52,7 @@
                 {% for roll in dice_log %}
                     <div class="card dice-log-entry">
                         <p>{{ roll['name'] }}</p>
-                        <p>{{ roll['roll_result'] }}</p>
+                        <p>{% if roll['formula'] %}{{ roll['formula'] }} = {% endif %}{{ roll['roll_result'] }}</p>
                         <small>Created at: {{ roll['created_at'] | format_datetime }}</small>
                     </div>
                 {% endfor %}

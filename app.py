@@ -31,6 +31,21 @@ def get_db():
     return g.db
 
 
+def has_dice_log_formula_column(conn):
+    """Checks whether dice_logs has a formula column."""
+
+    with conn.cursor() as cur:
+        cur.execute("""
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_schema = 'public'
+            AND table_name = 'dice_logs'
+            AND column_name = 'formula'
+            LIMIT 1
+        """)
+        return cur.fetchone() is not None
+
+
 def generate_join_code(length=10):
     characters = string.ascii_letters + string.digits
     return ''.join(random.choices(characters, k=length))
@@ -264,8 +279,9 @@ def campaign_detail(campaign_id):
         campaign_characters = cur.fetchall()
 
         # campaign's dice roll log
-        cur.execute("""
-            SELECT dice_logs.id, dice_logs.roll_result, characters.name, dice_logs.created_at
+        select_formula = "dice_logs.formula" if has_dice_log_formula_column(conn) else "NULL AS formula"
+        cur.execute(f"""
+            SELECT dice_logs.id, dice_logs.roll_result, {select_formula}, characters.name, dice_logs.created_at
             FROM dice_logs JOIN characters
             ON dice_logs.character_id = characters.id
             WHERE characters.campaign_id = %s
@@ -833,8 +849,9 @@ def dice_log(campaign_id):
         if cur.fetchone() is None:
             return jsonify({"error": "access denied"}), 403
 
-        cur.execute("""
-            SELECT dice_logs.roll_result, dice_logs.created_at, COALESCE(dice_logs.display_name, characters.name) AS name
+        select_formula = "dice_logs.formula" if has_dice_log_formula_column(conn) else "NULL AS formula"
+        cur.execute(f"""
+            SELECT dice_logs.roll_result, {select_formula}, dice_logs.created_at, COALESCE(dice_logs.display_name, characters.name) AS name
             FROM dice_logs JOIN characters
             ON dice_logs.character_id = characters.id
             WHERE dice_logs.campaign_id = %s
@@ -1390,6 +1407,8 @@ def roll_dice():
     if not match:
         return jsonify({"error": "Invalid dice roll formula"}), 400
 
+    normalized_formula = re.sub(r"\s+", "", formula)
+
     num_dice = int(match.group(1)) if match.group(1) else 1
     dice_type = int(match.group(2))
     modifier = int(match.group(3).replace(" ", "")) if match.group(3) else 0
@@ -1404,6 +1423,17 @@ def roll_dice():
     cur = None
     try:
         conn = get_db()
+
+        has_formula_column = has_dice_log_formula_column(conn)
+        if not has_formula_column:
+            try:
+                with conn.cursor() as cur:
+                    cur.execute("ALTER TABLE dice_logs ADD COLUMN IF NOT EXISTS formula TEXT")
+                conn.commit()
+                has_formula_column = True
+            except psycopg2.Error:
+                conn.rollback()
+
         with conn.cursor() as cur:
             # permission check: character belongs to campaign and user owns the character or campaign
             cur.execute("""
@@ -1417,10 +1447,16 @@ def roll_dice():
             if cur.fetchone() is None:
                 return jsonify({"error": "permission denied"}), 400
 
-            cur.execute("""
-                INSERT INTO dice_logs (campaign_id, character_id, roll_result, display_name)
-                VALUES (%s, %s, %s, %s)
-            """, (campaign_id, character_id, total, display_name,))
+            if has_formula_column:
+                cur.execute("""
+                    INSERT INTO dice_logs (campaign_id, character_id, roll_result, display_name, formula)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (campaign_id, character_id, total, display_name, normalized_formula,))
+            else:
+                cur.execute("""
+                    INSERT INTO dice_logs (campaign_id, character_id, roll_result, display_name)
+                    VALUES (%s, %s, %s, %s)
+                """, (campaign_id, character_id, total, display_name,))
             conn.commit()
 
         with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
@@ -1433,6 +1469,7 @@ def roll_dice():
         return jsonify({
             "name": character["name"],
             "display_name": display_name,
+            "formula": normalized_formula,
             "roll_result": total,
             "created_at": datetime.utcnow().isoformat(),
         })
